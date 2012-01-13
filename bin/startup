@@ -1,0 +1,16 @@
+#!/bin/sh
+
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+cd $DIR
+
+./bin/compile
+
+#supervise ./service/php-fpm &
+./service/php-fpm/run &
+
+sleep 1
+
+#supervise ./service/nginx &
+./service/nginx/run &
+
+sleep 1

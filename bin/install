@@ -1,0 +1,9 @@
+#!/bin/sh
+
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+cd $DIR
+
+git clone http://github.com/symfony/symfony-standard.git var/www
+
+cd var/www/
+php bin/vendors install

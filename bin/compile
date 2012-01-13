@@ -1,0 +1,50 @@
+#!/usr/bin/env php
+<?php
+
+chdir(__DIR__ . '/..');
+
+$opts = array();
+$opts['APP'] = realpath(__DIR__ . '/..');
+
+preg_match('!^/home/([^/]+)/!', $opts['APP'], $match);
+$opts['RUNUSER'] = $match[1];
+$opts['RUNGROUP'] = $match[1];
+
+if (file_exists($path = $opts['APP'] . '/etc/compile.ini')) {
+    $opts = array_merge($opts, parse_ini_file($path));
+}
+
+foreach ($opts as $k => $v) {
+    fwrite(STDOUT, $k . ': ' . $v . "\n");
+}
+
+function delvedir($path, $opts) {
+    $dh = opendir($path);
+
+    while (false !== $fn = readdir($dh)) {
+        if ($fn[0] == '.') {
+            continue;
+        } else if (is_dir($path . '/' . $fn)) {
+            delvedir($path . '/' . $fn, $opts);
+        } else if (in_array(pathinfo($fn, PATHINFO_EXTENSION), array('ini', 'conf'))) {
+            $data = file_get_contents($path . '/' . $fn);
+
+            preg_match_all('/\{\{ ([^\}]+) \}\}/', $data, $match);
+        
+            foreach ($match[1] as $k) {
+                if (!isset($opts[$k])) {
+                    throw new \InvalidArgumentException(sprintf('Undefined key "%s" in %s.', $k, $path . '/' . $fn));
+                }
+        
+                $data = str_replace('{{ ' . $k . ' }}', $opts[$k], $data);
+            }
+        
+            file_put_contents($path . '/' . $fn, $data);
+        }
+    }
+
+    closedir($dh);
+}
+
+exec('git checkout ' . $opts['APP'] . '/etc');
+delvedir($opts['APP'] . '/etc', $opts);

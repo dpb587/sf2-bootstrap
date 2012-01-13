@@ -1,0 +1,6 @@
+#!/bin/sh
+
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
+cd $DIR
+
+php-fpm -g $DIR/var/run/php-fpm.pid -y $DIR/etc/php-fpm.conf 1>>$DIR/var/log/php-fpm.log 2>&1

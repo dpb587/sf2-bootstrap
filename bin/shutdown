@@ -1,0 +1,17 @@
+#!/bin/sh
+
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+cd $DIR
+
+# svc -dt ./service/nginx
+kill -QUIT `cat ./var/run/nginx.pid`
+
+sleep 1
+
+# svc -dt ./service/php-fpm
+kill -QUIT `cat ./var/run/php-fpm.pid`
+
+sleep 1
+
+
+

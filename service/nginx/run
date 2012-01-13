@@ -1,0 +1,6 @@
+#!/bin/sh
+
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
+cd $DIR
+
+nginx -c $DIR/etc/nginx.conf 1>>$DIR/var/log/nginx.log 2>&1
